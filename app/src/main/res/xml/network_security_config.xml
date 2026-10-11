@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 服务地址可在应用内配置(内网 HTTP 服务,IP 随部署现场变化),无法按 IP 逐一放行,故全局允许明文 HTTP -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

@@ -1,0 +1,110 @@
+[
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_tuidan.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/tuidan.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/xml_network_security_config.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/drawable_bg_tab_container.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/drawable/bg_tab_container.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_daifangxing.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/daifangxing.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_chayan.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/chayan.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/drawable_bg_icon_button.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/drawable/bg_icon_button.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_shenfenheyan.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/shenfenheyan.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_dairengongshenhe.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/dairengongshenhe.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/drawable_bg_search_input.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/drawable/bg_search_input.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_weipantu.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/weipantu.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/layout_activity_main.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/drawable_bg_tab_selected.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/drawable/bg_tab_selected.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/drawable_bg_card.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/drawable/bg_card.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_fangxing.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/fangxing.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/drawable_bg_primary_button.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/drawable/bg_primary_button.xml"
+    },
+    {
+        "merged": "com.outbound.scan.app-merged_res-22:/raw_weipantu.wav.flat",
+        "source": "com.outbound.scan.app-main-24:/raw/weipantu.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/drawable_bg_status_success.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/drawable/bg_status_success.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_wushuju.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/wushuju.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_tuiyun.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/tuiyun.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/drawable_bg_status_row.xml.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/drawable/bg_status_row.xml"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_xiaohui.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/xiaohui.wav"
+    },
+    {
+        "merged": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-merged_res-22:/raw_shenhetongguodaifangxing.wav.flat",
+        "source": "/Users/qilin/.gradle/daemon/8.13/com.outbound.scan.app-main-24:/raw/shenhetongguodaifangxing.wav"
+    }
+]

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="page_background">#F4F7FB</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_surface">#F8FAFD</color>
+    <color name="input_background">#F6F8FC</color>
+    <color name="input_stroke">#D7DFEB</color>
+    <color name="divider">#E6EBF2</color>
+
+    <color name="brand_primary">#2F6BFF</color>
+    <color name="brand_primary_dark">#2457D1</color>
+    <color name="brand_primary_soft">#EAF1FF</color>
+    <color name="tab_selected">#2F6BFF</color>
+    <color name="tab_unselected">#8B97A8</color>
+
+    <color name="text_primary">#18202A</color>
+    <color name="text_secondary">#66758A</color>
+    <color name="text_hint">#96A2B2</color>
+    <color name="text_on_primary">#FFFFFF</color>
+
+    <color name="status_success_bg">#E8F7EE</color>
+    <color name="status_success_text">#227A47</color>
+    <color name="outbound_success">#227A47</color>
+
+    <color name="release_green">#227A47</color>
+    <color name="abnormal_red">#C62828</color>
+</resources>
