@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.media.MediaPlayer
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -21,9 +20,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -35,7 +31,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
-import java.util.Collections
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,15 +38,10 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "OutboundScan"
         private const val PREFS_NAME = "outbound_scan_prefs"
         private const val KEY_BASE_URL = "base_url"
-        private const val KEY_BROADCAST_ORDER = "broadcast_order"
         private const val SUCCESS_CODE = 200
         private const val CODE_WEIGUOJI = 404 // 违规件
         private const val CODE_YICHUKU = 405 // 已出库
         private const val DEFAULT_BASE_URL = "http://192.168.26.200:4017"
-        private const val STATUS_KEY_SUPPLEMENT = "supplement"
-        private const val STATUS_KEY_CUSTOMS = "customs"
-        private const val STATUS_KEY_COMPARE = "compare"
-        private const val STATUS_KEY_REVIEW = "review"
     }
 
     private lateinit var etBarcode: EditText
@@ -77,13 +67,6 @@ class MainActivity : AppCompatActivity() {
     private var scanReceiver: BroadcastReceiver? = null
     private val client = OkHttpClient()
     private val gson = Gson()
-    /** 播报条目,列表顺序即默认优先级:补录 > 海关 > 同屏比对 > 集中审图 */
-    private val broadcastOptions = listOf(
-        BroadcastOption(STATUS_KEY_SUPPLEMENT, "补录状态"),
-        BroadcastOption(STATUS_KEY_CUSTOMS, "海关状态"),
-        BroadcastOption(STATUS_KEY_COMPARE, "同屏比对状态"),
-        BroadcastOption(STATUS_KEY_REVIEW, "集中审图状态")
-    )
 
     data class OutboundRequest(
         val barcode: String,
@@ -113,11 +96,6 @@ class MainActivity : AppCompatActivity() {
         val customsStatus: Int?,
         @SerializedName("createTime")
         val createTime: String?
-    )
-
-    data class BroadcastOption(
-        val value: String,
-        val label: String
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -166,7 +144,7 @@ class MainActivity : AppCompatActivity() {
         tabOutbound.setOnClickListener { selectTab(true) }
 
         ivSettings.setOnClickListener {
-            showSettingsDialog()
+            showBaseUrlDialog()
         }
     }
 
@@ -325,28 +303,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** 播报:整体放行播「放行」,否则按用户设置的优先级播第一个非放行状态,只播一条 */
+    /** 播报:整体放行播「放行」;否则任一状态为查验播「查验」;再否则有查无数据类状态播「查无数据」,其余不播 */
     private fun playVoice(data: OutboundData) {
         if (isAllRelease(data)) {
             playVoiceRes(R.raw.fangxing)
             return
         }
-        val statusByKey = mapOf(
-            STATUS_KEY_SUPPLEMENT to data.customsStatus,
-            STATUS_KEY_CUSTOMS to data.preJudge,
-            STATUS_KEY_COMPARE to data.imageJudge,
-            STATUS_KEY_REVIEW to data.centralizeJudge
-        )
-        for (key in getBroadcastOrder()) {
-            if (key !in statusByKey) continue
-            val status = statusByKey[key]
-            // 补录空值属于正常状态,不参与播报
-            if (key == STATUS_KEY_SUPPLEMENT && status == null) continue
-            if (isRelease(status)) continue
-            val resId = getVoiceResId(key, status) ?: continue // 暂无对应语音,继续找下一个
-            playVoiceRes(resId)
+        // 查验全局优先
+        if (data.customsStatus == 1 || data.preJudge == 1 || data.imageJudge == 1 || data.centralizeJudge == 1) {
+            playVoiceRes(R.raw.chayan)
             return
         }
+        // 没有查验,有查无数据类状态播查无数据
+        if (hasNoDataStatus(data)) {
+            playVoiceRes(R.raw.wushuju)
+        }
+        // 其余情况不播报
+    }
+
+    /** 查无数据类状态:任意非放行状态值;补录/同屏比对/集中审图的空值属于正常状态,不参与 */
+    private fun hasNoDataStatus(data: OutboundData): Boolean {
+        // 调用前已排除查验,非放行(0)即报查无数据;海关空值同样报查无数据
+        return (data.customsStatus != null && !isRelease(data.customsStatus))
+                || !isRelease(data.preJudge)
+                || (data.imageJudge != null && !isRelease(data.imageJudge))
+                || (data.centralizeJudge != null && !isRelease(data.centralizeJudge))
     }
 
     /** 是否放行状态:目前只有 0 表示放行,后续如需增加放行码在此扩展 */
@@ -370,29 +351,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getVoiceResId(key: String, status: Int?): Int? {
-        // 同屏比对/集中审图为空时表示未判图
-        if (status == null) {
-            return if (key == STATUS_KEY_COMPARE || key == STATUS_KEY_REVIEW) {
-                R.raw.weipantu
-            } else {
-                R.raw.wushuju
-            }
-        }
-        return when (status) {
-            0 -> R.raw.fangxing
-            1 -> R.raw.chayan
-            2 -> R.raw.wushuju
-            3, 8 -> R.raw.shenhetongguodaifangxing
-            4 -> R.raw.dairengongshenhe
-            5 -> R.raw.tuidan
-            6 -> R.raw.tuiyun
-            7 -> R.raw.xiaohui
-            9 -> R.raw.shenfenheyan
-            else -> null
-        }
-    }
-
     /** 状态文字颜色:放行绿色,其余红色 */
     private fun getStatusColor(status: Int?): Int {
         val resId = if (isRelease(status)) R.color.release_green else R.color.abnormal_red
@@ -410,103 +368,7 @@ class MainActivity : AppCompatActivity() {
             .orEmpty()
     }
 
-    /** 读取播报优先级顺序,保存值非法或缺失时返回默认顺序 */
-    private fun getBroadcastOrder(): List<String> {
-        val saved = getPrefs().getString(KEY_BROADCAST_ORDER, "").orEmpty()
-        val parsed = saved.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        val keys = broadcastOptions.map { it.value }
-        return if (parsed.size == keys.size && parsed.toSet() == keys.toSet()) parsed else keys
-    }
-
     private fun getPrefs() = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
-    /** 播报优先级设置:长按拖动排序,扫描后按顺序播报第一个非放行状态 */
-    private fun showSettingsDialog() {
-        val order = getBroadcastOrder().toMutableList()
-        val adapter = BroadcastOrderAdapter(order)
-        val recyclerView = RecyclerView(this).apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            isNestedScrollingEnabled = false
-            this.adapter = adapter
-        }
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                val from = viewHolder.bindingAdapterPosition
-                val to = target.bindingAdapterPosition
-                Collections.swap(order, from, to)
-                adapter.notifyItemMoved(from, to)
-                return true
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
-
-            override fun isLongPressDragEnabled(): Boolean = true
-        }).attachToRecyclerView(recyclerView)
-
-        val contentView = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(8), dp(20), 0)
-            addView(
-                TextView(this@MainActivity).apply {
-                    text = "播报设置"
-                    textSize = 15f
-                    setTextColor(ContextCompat.getColor(this@MainActivity, R.color.text_primary))
-                }
-            )
-            addView(
-                TextView(this@MainActivity).apply {
-                    text = "长按拖动调整播报优先级，扫描后按顺序播报第一个非放行状态。"
-                    textSize = 12f
-                    setTextColor(ContextCompat.getColor(this@MainActivity, R.color.text_secondary))
-                    setPadding(0, dp(6), 0, dp(10))
-                }
-            )
-            addView(recyclerView)
-        }
-
-        AlertDialog.Builder(this)
-            .setTitle("设置")
-            .setView(contentView)
-            .setPositiveButton("确定") { _, _ ->
-                getPrefs()
-                    .edit()
-                    .putString(KEY_BROADCAST_ORDER, order.joinToString(","))
-                    .apply()
-                Toast.makeText(this, "播报优先级已保存", Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton("取消", null)
-            .show()
-    }
-
-    /** 播报优先级条目,按 key 显示对应标签 */
-    private inner class BroadcastOrderAdapter(
-        private val items: MutableList<String>
-    ) : RecyclerView.Adapter<BroadcastOrderAdapter.ViewHolder>() {
-
-        inner class ViewHolder(val tvLabel: TextView) : RecyclerView.ViewHolder(tvLabel)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val tv = TextView(parent.context).apply {
-                textSize = 15f
-                setTextColor(ContextCompat.getColor(this@MainActivity, R.color.text_primary))
-                setPadding(dp(4), dp(12), dp(4), dp(12))
-            }
-            return ViewHolder(tv)
-        }
-
-        override fun getItemCount(): Int = items.size
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val key = items[position]
-            holder.tvLabel.text = broadcastOptions.firstOrNull { it.value == key }?.label ?: key
-        }
-    }
 
     private fun showBaseUrlDialog() {
         val input = AndroidEditText(this).apply {
@@ -633,9 +495,5 @@ class MainActivity : AppCompatActivity() {
 
     private fun String?.toDisplayValue(): String {
         return if (this.isNullOrBlank()) "-" else this
-    }
-
-    private fun dp(value: Int): Int {
-        return (value * resources.displayMetrics.density).toInt()
     }
 }
