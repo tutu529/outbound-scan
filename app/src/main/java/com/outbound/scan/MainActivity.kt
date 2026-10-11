@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity() {
         private const val KEY_BASE_URL = "base_url"
         private const val KEY_BROADCAST_ORDER = "broadcast_order"
         private const val SUCCESS_CODE = 200
+        private const val CODE_WEIGUOJI = 404 // 违规件
+        private const val CODE_YICHUKU = 405 // 已出库
         private const val DEFAULT_BASE_URL = "http://192.168.26.200:4017"
         private const val STATUS_KEY_SUPPLEMENT = "supplement"
         private const val STATUS_KEY_CUSTOMS = "customs"
@@ -246,6 +248,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleApiResponse(code: String, model: Int, response: ApiResponse<OutboundData>) {
         if (response.code != SUCCESS_CODE) {
+            // 业务码 404 播「违规件」、405 播「已出库」,其余只提示
+            val voiceRes = when (response.code) {
+                CODE_WEIGUOJI -> R.raw.weiguoji
+                CODE_YICHUKU -> R.raw.yichuku
+                else -> null
+            }
+            voiceRes?.let { playVoiceRes(it) }
             Toast.makeText(this, response.message ?: "操作失败", Toast.LENGTH_SHORT).show()
             return
         }
