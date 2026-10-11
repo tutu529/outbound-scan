@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvItemName: TextView
     private lateinit var tvBarcode: TextView
     private lateinit var tvDeviceTime: TextView
+    private lateinit var tvLineId: TextView
 
     private lateinit var tvCustomsStatus: TextView
     private lateinit var tvCompareStatus: TextView
@@ -95,7 +96,9 @@ class MainActivity : AppCompatActivity() {
         @SerializedName("customsStatus")
         val customsStatus: Int?,
         @SerializedName("createTime")
-        val createTime: String?
+        val createTime: String?,
+        @SerializedName("lineId")
+        val lineId: String?
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         tvItemName = findViewById(R.id.tv_item_name)
         tvBarcode = findViewById(R.id.tv_barcode)
         tvDeviceTime = findViewById(R.id.tv_device_time)
+        tvLineId = findViewById(R.id.tv_line_id)
         tvCustomsStatus = findViewById(R.id.tv_customs_status)
         tvCompareStatus = findViewById(R.id.tv_compare_status)
         tvReviewStatus = findViewById(R.id.tv_review_status)
@@ -254,6 +258,7 @@ class MainActivity : AppCompatActivity() {
         tvItemName.text = "商品名:${data.materialBaseName.toDisplayValue()}"
         tvBarcode.text = "扫描条码:$code"
         tvDeviceTime.text = "扫描时间:${data.deviceTime}"
+        tvLineId.text = "线体号:${data.lineId.toDisplayValue()}"
         tvCustomsStatus.text = "海关状态:${mapCustomsStatus(data.preJudge)}"
         tvCustomsStatus.setTextColor(getStatusColor(data.preJudge))
         tvCompareStatus.text = "同屏比对状态:${mapJudgeStatus(data.imageJudge)}"
@@ -426,6 +431,7 @@ class MainActivity : AppCompatActivity() {
         tvItemName.text = "商品名:-"
         tvBarcode.text = "扫描条码:-"
         tvDeviceTime.text = "扫描时间:-"
+        tvLineId.text = "线体号:-"
 
         tvCustomsStatus.text = "海关状态:-"
         tvCustomsStatus.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
