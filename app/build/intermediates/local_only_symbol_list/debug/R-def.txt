@@ -39,6 +39,7 @@ id tv_compare_status
 id tv_customs_status
 id tv_device_time
 id tv_item_name
+id tv_line_id
 id tv_review_status
 id tv_supplement_status
 id tv_supplement_time
@@ -53,7 +54,9 @@ raw shenfenheyan
 raw shenhetongguodaifangxing
 raw tuidan
 raw tuiyun
+raw weiguoji
 raw weipantu
 raw wushuju
 raw xiaohui
+raw yichuku
 xml network_security_config

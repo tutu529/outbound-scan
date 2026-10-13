@@ -42,6 +42,9 @@ class MainActivity : AppCompatActivity() {
         private const val CODE_WEIGUOJI = 404 // 未过机
         private const val CODE_YICHUKU = 405 // 已出库
         private const val DEFAULT_BASE_URL = "http://192.168.26.200:4017"
+        private const val KEY_MODE = "display_mode"
+        private const val MODE_COMPARE = "compare" // 同屏比对模式,默认
+        private const val MODE_REVIEW = "review" // 集中审图模式
     }
 
     private lateinit var etBarcode: EditText
@@ -109,6 +112,7 @@ class MainActivity : AppCompatActivity() {
         initScanReceiver()
         registerScanReceiver()
         setListeners()
+        applyModeVisibility()
         selectTab(true)
     }
 
@@ -148,7 +152,7 @@ class MainActivity : AppCompatActivity() {
         tabOutbound.setOnClickListener { selectTab(true) }
 
         ivSettings.setOnClickListener {
-            showBaseUrlDialog()
+            showSettingsDialog()
         }
     }
 
@@ -191,6 +195,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onResponse(call: Call, response: Response) {
                     try {
                         val body = response.body?.string().orEmpty()
+                        Log.d(TAG, "接口返回:HTTP ${response.code} $body")
                         if (!response.isSuccessful) {
                             Log.e(TAG, "接口响应异常:${response.code} $body")
                             runOnUiThread {
@@ -259,7 +264,7 @@ class MainActivity : AppCompatActivity() {
         tvBarcode.text = "扫描条码:$code"
         tvDeviceTime.text = "扫描时间:${data.deviceTime}"
         tvLineId.text = "线体号:${data.lineId.toDisplayValue()}"
-        tvCustomsStatus.text = "海关状态:${mapCustomsStatus(data.preJudge)}"
+        tvCustomsStatus.text = "海关状态:${mapPreJudge(data.preJudge)}"
         tvCustomsStatus.setTextColor(getStatusColor(data.preJudge))
         tvCompareStatus.text = "同屏比对状态:${mapJudgeStatus(data.imageJudge)}"
         tvCompareStatus.setTextColor(getStatusColor(data.imageJudge))
@@ -290,6 +295,15 @@ class MainActivity : AppCompatActivity() {
         return if (status == null) "未知" else mapCustomsStatus(status)
     }
 
+    /** 海关状态显示:仅 0 放行、1 查验,其余(含空)一律查无数据,与播报逻辑一致 */
+    private fun mapPreJudge(status: Int?): String {
+        return when (status) {
+            0 -> "放行"
+            1 -> "查验"
+            else -> "查无数据"
+        }
+    }
+
     private fun mapCustomsStatus(status: Int?): String {
         return when (status) {
             1 -> "查验"
@@ -308,13 +322,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** 播报:整体放行播「放行」;否则任一状态为查验播「查验」;再否则有查无数据类状态播「查无数据」,其余不播 */
+    /** 播报入口:按当前模式分发 */
     private fun playVoice(data: OutboundData) {
+        if (isCompareMode()) {
+            playVoiceCompare(data)
+        } else {
+            playVoiceReview(data)
+        }
+    }
+
+    /** 同屏比对模式:只看海关(preJudge)和同屏比对(imageJudge),集中审图和补录不参与 */
+    private fun playVoiceCompare(data: OutboundData) {
+        // 两个都放行
+        if (isRelease(data.preJudge) && isRelease(data.imageJudge)) {
+            playVoiceRes(R.raw.fangxing)
+            return
+        }
+        // 海关或同屏比对有查验
+        if (data.preJudge == 1 || data.imageJudge == 1) {
+            playVoiceRes(R.raw.chayan)
+            return
+        }
+        // 海关非放行(含无数据)报查无数据;同屏比对为 null(未判图)静默
+        if (!isRelease(data.preJudge)) {
+            playVoiceRes(R.raw.wushuju)
+        }
+        // 其余情况不播报
+    }
+
+    /** 集中审图模式:整体放行播「放行」;否则任一状态为查验播「查验」;再否则有查无数据类状态播「查无数据」,其余不播 */
+    private fun playVoiceReview(data: OutboundData) {
         if (isAllRelease(data)) {
             playVoiceRes(R.raw.fangxing)
             return
         }
-        // 查验全局优先
+        // 查验全局优先(补录查验同样播查验)
         if (data.customsStatus == 1 || data.preJudge == 1 || data.imageJudge == 1 || data.centralizeJudge == 1) {
             playVoiceRes(R.raw.chayan)
             return
@@ -350,7 +392,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun playVoiceRes(resId: Int) {
         releaseMediaPlayer()
-        mediaPlayer = MediaPlayer.create(this, resId).apply {
+        val player = MediaPlayer.create(this, resId)
+        if (player == null) {
+            Log.e(TAG, "语音播放失败:资源 $resId 加载失败")
+            return
+        }
+        Log.d(TAG, "播放语音:resId=$resId")
+        mediaPlayer = player.apply {
             setOnCompletionListener { releaseMediaPlayer() }
             start()
         }
@@ -374,6 +422,41 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getPrefs() = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    /** 是否为同屏比对模式,默认是;否则为集中审图模式 */
+    private fun isCompareMode(): Boolean {
+        return getPrefs().getString(KEY_MODE, MODE_COMPARE) != MODE_REVIEW
+    }
+
+    /** 按当前模式更新状态区可见性:同屏比对模式隐藏集中审图和补录 */
+    private fun applyModeVisibility() {
+        if (isCompareMode()) {
+            tvReviewStatus.visibility = View.GONE
+            llSupplementCard.visibility = View.GONE
+        } else {
+            tvReviewStatus.visibility = View.VISIBLE
+            llSupplementCard.visibility = View.VISIBLE
+        }
+    }
+
+    /** 设置:选择同屏比对模式或集中审图模式,选择后立即生效并清空页面 */
+    private fun showSettingsDialog() {
+        val options = arrayOf("同屏比对模式", "集中审图模式")
+        val checked = if (isCompareMode()) 0 else 1
+        AlertDialog.Builder(this)
+            .setTitle("设置")
+            .setSingleChoiceItems(options, checked) { dialog, which ->
+                getPrefs()
+                    .edit()
+                    .putString(KEY_MODE, if (which == 0) MODE_COMPARE else MODE_REVIEW)
+                    .apply()
+                dialog.dismiss()
+                applyModeVisibility()
+                resetData()
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
 
     private fun showBaseUrlDialog() {
         val input = AndroidEditText(this).apply {
@@ -442,7 +525,7 @@ class MainActivity : AppCompatActivity() {
         tvSupplementStatus.text = "补录状态:-"
         tvSupplementStatus.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
         tvSupplementTime.text = "补录时间:-"
-        llSupplementCard.visibility = View.VISIBLE
+        applyModeVisibility()
     }
 
     /** iData 95 等 PDA 扫码枪广播:扫描结果在 value 键,其余为兼容键 */

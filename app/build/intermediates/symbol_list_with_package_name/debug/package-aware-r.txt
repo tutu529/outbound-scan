@@ -865,6 +865,7 @@ id tv_compare_status
 id tv_customs_status
 id tv_device_time
 id tv_item_name
+id tv_line_id
 id tv_review_status
 id tv_supplement_status
 id tv_supplement_time
@@ -943,9 +944,11 @@ raw shenfenheyan
 raw shenhetongguodaifangxing
 raw tuidan
 raw tuiyun
+raw weiguoji
 raw weipantu
 raw wushuju
 raw xiaohui
+raw yichuku
 string abc_action_bar_home_description
 string abc_action_bar_up_description
 string abc_action_menu_overflow_description
