@@ -4,7 +4,7 @@
             "outputFile": "com.outbound.scan.app-mergeDebugResources-20:/values-land/values-land.xml",
             "map": [
                 {
-                    "source": "/Users/qilin/.gradle/caches/8.13/transforms/c2a9498887d9ae31f8522466415f9b63/transformed/appcompat-1.6.1/res/values-land/values-land.xml",
+                    "source": "C:\\Users\\李悦恒\\.gradle\\caches\\8.13\\transforms\\c2a9498887d9ae31f8522466415f9b63\\transformed\\appcompat-1.6.1\\res\\values-land\\values-land.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",

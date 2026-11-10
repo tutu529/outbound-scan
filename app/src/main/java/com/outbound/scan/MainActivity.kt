@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         private const val STATUS_KEY_CUSTOMS = "customs"
         private const val STATUS_KEY_COMPARE = "compare"
         private const val STATUS_KEY_REVIEW = "review"
+        private const val STATUS_UNKNOWN = -2
     }
 
     private lateinit var etBarcode: EditText
@@ -293,11 +294,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** 同屏比对/集中审图状态:null 表示未判图 */
+    /** 同屏比对/集中审图状态:null 表示未判图,-2 表示未知 */
     private fun mapJudgeStatus(status: Int?): String {
         return if (status == null) "未知" else mapCustomsStatus(status)
     }
 
+    /** 状态码映射:-2 为未知,不参与播报 */
     private fun mapCustomsStatus(status: Int?): String {
         return when (status) {
             1 -> "查验"
@@ -311,6 +313,7 @@ class MainActivity : AppCompatActivity() {
             8 -> "审核通过待放行"
             9 -> "身份核验"
             -3 -> "未审图"
+            STATUS_UNKNOWN -> "未知"
             null -> "查无数据"
             else -> status.toString()
         }
@@ -362,6 +365,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getVoiceResId(key: String, status: Int?): Int? {
+        // -2 表示未知,不播报,交由下一个优先级条目
+        if (status == STATUS_UNKNOWN) return null
         // 同屏比对/集中审图为空时表示未判图
         if (status == null) {
             return if (key == STATUS_KEY_COMPARE || key == STATUS_KEY_REVIEW) {
