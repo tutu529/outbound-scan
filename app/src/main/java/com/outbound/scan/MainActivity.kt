@@ -290,7 +290,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** 同屏比对/集中审图状态:null 表示未判图 */
+    /** 同屏比对/集中审图状态:null 或 -3 表示未判图,显示未知 */
     private fun mapJudgeStatus(status: Int?): String {
         return if (status == null) "未知" else mapCustomsStatus(status)
     }
@@ -316,7 +316,7 @@ class MainActivity : AppCompatActivity() {
             7 -> "销毁"
             8 -> "审核通过待放行"
             9 -> "身份核验"
-            -3 -> "未审图"
+            -3 -> "未知"
             null -> "查无数据"
             else -> status.toString()
         }
@@ -368,13 +368,18 @@ class MainActivity : AppCompatActivity() {
         // 其余情况不播报
     }
 
-    /** 查无数据类状态:任意非放行状态值;补录/同屏比对/集中审图的空值属于正常状态,不参与 */
+    /** 查无数据类状态:任意非放行状态值;补录空值、同屏比对/集中审图的未判图(null/-3)属于正常状态,不参与 */
     private fun hasNoDataStatus(data: OutboundData): Boolean {
-        // 调用前已排除查验,非放行(0)即报查无数据;海关空值同样报查无数据
+        // 调用前已排除查验;非放行(0)且非未判图(null/-3)即报查无数据;海关空值同样报查无数据
         return (data.customsStatus != null && !isRelease(data.customsStatus))
                 || !isRelease(data.preJudge)
-                || (data.imageJudge != null && !isRelease(data.imageJudge))
-                || (data.centralizeJudge != null && !isRelease(data.centralizeJudge))
+                || (!isNotJudged(data.imageJudge) && !isRelease(data.imageJudge))
+                || (!isNotJudged(data.centralizeJudge) && !isRelease(data.centralizeJudge))
+    }
+
+    /** 是否未判图:null 或 -3 均视为未判图,播报静默 */
+    private fun isNotJudged(status: Int?): Boolean {
+        return status == null || status == -3
     }
 
     /** 是否放行状态:目前只有 0 表示放行,后续如需增加放行码在此扩展 */
